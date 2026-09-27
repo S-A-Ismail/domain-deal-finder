@@ -1,0 +1,6 @@
+registrar,tld,currency,register,renew,transfer,block_years,payment_methods,notes,source_url,checked_on
+PKNIC,pk,PKR,2100,2100,,2,,Rate for registrants based in Pakistan (foreign registrants pay $15.99/yr). Billed in 2-year blocks up to 10 years.,https://pknic.net.pk/,2026-09-28
+PKNIC,com.pk,PKR,2100,2100,,2,,Rate for registrants based in Pakistan (foreign registrants pay $15.99/yr). Billed in 2-year blocks up to 10 years.,https://pknic.net.pk/,2026-09-28
+PKNIC,net.pk,PKR,2100,2100,,2,,Rate for registrants based in Pakistan (foreign registrants pay $15.99/yr). Billed in 2-year blocks up to 10 years.,https://pknic.net.pk/,2026-09-28
+PKNIC,org.pk,PKR,2100,2100,,2,,Rate for registrants based in Pakistan (foreign registrants pay $15.99/yr). Billed in 2-year blocks up to 10 years.,https://pknic.net.pk/,2026-09-28
+# Example reseller,com,PKR,3500,4200,4200,1,jazzcash;easypaisa;bank transfer,Copy this line and fill in real prices from the reseller's pricing page,https://example.pk/domains,2026-01-01

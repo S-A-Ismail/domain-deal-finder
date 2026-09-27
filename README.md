@@ -27,13 +27,24 @@ python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-The `find` command (the AI agent) needs an Anthropic API key: `export ANTHROPIC_API_KEY=...`. Everything else works
-without one.
+## Three ways to search
+
+| Way | Needs | Who comes up with names |
+|---|---|---|
+| **Claude Code skill** (recommended) | Claude Code signed in with your Claude plan, no API key | Claude, in your Claude Code session |
+| `python -m ddf suggest` | nothing | fixed rules: prefixes, suffixes, local words, common TLDs |
+| `python -m ddf find` | an Anthropic API key (`export ANTHROPIC_API_KEY=...`) | Claude, via the API |
+
+**Claude Code skill:** open Claude Code in this folder and ask, for example, *"find domains for minilake, 3 years,
+budget Rs 6,000"*. The skill in `.claude/skills/find-domains/` tells Claude to brainstorm names and check and price them
+with `ddf`, so every number still comes from the tool.
 
 ## Usage
 
 ```bash
-python -m ddf find "biryani" --years 3 --budget 6000     # AI agent: ideas -> availability -> cheapest plans
+python -m ddf suggest minilake --years 3 --budget 6000   # no-AI search: variations -> availability -> ranking
+python -m ddf suggest --names a.pk b.com c.store         # rank exactly these names
+python -m ddf find "biryani" --years 3 --budget 6000     # AI agent over the API
 python -m ddf check biryani.pk getbiryani.store           # are these free?
 python -m ddf plans getbiryani.store                      # cheapest 1-5 year plans for one domain
 python -m ddf tlds --years 3                              # which TLDs are cheapest to hold for 3 years
@@ -56,6 +67,7 @@ Settings (environment variables):
 | `.pk` prices | PKNIC, entered in `data/manual_prices.csv` | - |
 | Availability (most TLDs) | RDAP, routed via the IANA bootstrap file | No |
 | Availability (`.pk`) | PKNIC's lookup page | No |
+| Availability (TLDs without RDAP, e.g. `.io`, `.co`) | DNS over HTTPS (Cloudflare); marked `~` as less certain | No |
 | Real vs. alternative-root TLDs | IANA root zone list (drops Handshake TLDs that don't resolve in normal browsers) | No |
 | USD to PKR | open.er-api.com | No |
 

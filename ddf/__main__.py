@@ -41,7 +41,15 @@ def cmd_tlds(service: DomainService, args) -> None:
     print_basis(result)
 
 
+NO_KEY_HELP = """The `find` command needs an Anthropic API key.
+  1. Create one at https://console.anthropic.com/settings/keys
+  2. Add it to your shell:  echo 'export ANTHROPIC_API_KEY="sk-ant-..."' >> ~/.bashrc && source ~/.bashrc
+The check, plans and tlds commands work without a key."""
+
+
 def cmd_find(service: DomainService, args) -> None:
+    import anthropic
+
     from . import agent
 
     request = f"Keyword: {args.keyword}."
@@ -51,7 +59,15 @@ def cmd_find(service: DomainService, args) -> None:
         request += f" Budget: Rs {args.budget:,} total."
     if args.tlds:
         request += f" Preferred TLDs: {args.tlds}."
-    print(agent.run(request, service))
+    try:
+        print(agent.run(request, service))
+    except anthropic.AuthenticationError:
+        sys.exit("Anthropic rejected the API key (401). Check ANTHROPIC_API_KEY.\n\n" + NO_KEY_HELP)
+    except TypeError as e:
+        # The SDK raises TypeError before sending anything when it finds no credentials at all.
+        if "Could not resolve authentication method" not in str(e):
+            raise
+        sys.exit(NO_KEY_HELP)
 
 
 def print_basis(result: dict) -> None:

@@ -64,6 +64,33 @@ class DomainService:
             **self.pricing_basis(),
         }
 
+    def rank(self, domains: list[str], years: int, budget_pkr: int | None = None) -> dict:
+        """Check a batch of names, price the free ones, and sort by the cost of holding them for `years`."""
+        checks = self.check(domains)
+        rows, over_budget, unpriced = [], [], []
+        for c in checks:
+            if c["status"] != "available":
+                continue
+            result = self.plans(c["domain"], top=1)
+            if "error" in result:
+                unpriced.append(c["domain"])
+                continue
+            row = {"domain": c["domain"], "via": c["via"], "best": {n: ps[0] for n, ps in result["plans_by_years"].items()}}
+            if budget_pkr is not None and row["best"][years]["total_pkr"] > budget_pkr:
+                over_budget.append(row)
+            else:
+                rows.append(row)
+        order = lambda r: (r["best"][years]["total_pkr"], len(r["domain"]))  # noqa: E731
+        return {
+            "checked": len(checks),
+            "taken": sum(c["status"] == "taken" for c in checks),
+            "unknown": [c["domain"] for c in checks if c["status"] in ("unknown", "invalid")],
+            "unpriced": unpriced,
+            "rows": sorted(rows, key=order),
+            "over_budget": sorted(over_budget, key=order),
+            **self.pricing_basis(),
+        }
+
     def cheapest_tlds(self, years: int, limit: int = 25) -> dict:
         ranked = cheapest_tlds(self.offers_by_tld(), years, self.money(), limit)
         return {

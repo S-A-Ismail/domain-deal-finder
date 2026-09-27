@@ -1,4 +1,4 @@
-from ddf.availability import AVAILABLE, TAKEN, UNKNOWN, normalize, parse_pknic, rdap_base
+from ddf.availability import AVAILABLE, TAKEN, UNKNOWN, normalize, parse_doh, parse_pknic, rdap_base
 from ddf.registrars import manual, porkbun
 
 BOOTSTRAP = {"services": [[["com", "net"], ["https://rdap.verisign.com/com/v1/"]], [["store"], ["https://rdap.centralnic.com/store/"]]]}
@@ -23,6 +23,12 @@ def test_parse_pknic():
     assert parse_pknic(taken) == (TAKEN, "expires Dec 1, 2026")
     assert parse_pknic("Domain not found: zz.pk This domain is not registered")[0] == AVAILABLE
     assert parse_pknic("<html>maintenance</html>")[0] == UNKNOWN
+
+
+def test_parse_doh():
+    assert parse_doh({"Status": 0, "Answer": [{"data": "ns1.google.com."}]})[0] == TAKEN
+    assert parse_doh({"Status": 3})[0] == AVAILABLE
+    assert parse_doh({"Status": 2})[0] == UNKNOWN
 
 
 def test_porkbun_parse_skips_bad_rows():
